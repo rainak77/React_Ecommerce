@@ -6,36 +6,37 @@ import ShopPage from './pages/shop/shop.component';
 
 import Header from './components/header/header-component';
 import signInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
-
+import { connect } from 'react-redux';
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
-
-
+import { CurrentUserSet } from './redux/user/user.action';
 class App extends React.Component {
-  constructor() {
-    super();
+  // constructor() {
+  //   super();
 
-    this.state = {
-      currentUser: null
-    };
-  }
+  //   this.state = {
+  //     currentUser: null
+  //   };
+  // }
 
   unsubscribeFromAuth = null;
 
   componentDidMount() {
+    // console.log(this.props);
+    const { setCurrentUser } = this.props;
+
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      console.log(userAuth);
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
-        userRef.onSnapshot(onSnapshot => {
-          this.setState({
-            currentUser: {
-              id: onSnapshot.id,
-              ...onSnapshot.data()
-            }
-          });
+
+        userRef.onSnapshot(snapshot => {
+          setCurrentUser(
+            { id: snapshot.id, ...snapshot.data() }
+          );
         });
       }
       else {
-        this.setState({ currentUser: userAuth });
+        setCurrentUser(userAuth);
       }
     });
   }
@@ -47,7 +48,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="App" >
-        <Header currentUser={this.state.currentUser} />
+        <Header />
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route path='/shop' component={ShopPage} />
@@ -57,5 +58,10 @@ class App extends React.Component {
     );
   };
 }
+const mapDispatchToProps = dispatch => ({
+  setCurrentUser: (user) => {
+    return dispatch(CurrentUserSet(user));
+  }
+});
 
-export default App;
+export default connect(null, mapDispatchToProps)(App);
