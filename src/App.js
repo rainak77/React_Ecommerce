@@ -31,9 +31,9 @@ class App extends React.Component {
           );
         });
       }
-      else {
+      else
         setCurrentUser(userAuth);
-      }
+
     });
   }
 
