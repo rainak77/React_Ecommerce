@@ -17,13 +17,9 @@ const CartIcon = ({ toggle, itemCount }) => {
     );
 };
 
-const mapStateToProp = (state) => {
-    console.log('i am Icon');
-    return (
-        {
-            itemCount: selectCartItemsCount(state)
-        });
-};
+const mapStateToProp = (state) => ({
+    itemCount: selectCartItemsCount(state)
+});
 
 
 const mapDispatchToProps = (dispatch) => ({
