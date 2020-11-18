@@ -13,14 +13,15 @@ const config = {
     measurementId: "G-JDQMN1BNM7"
 };
 
+firebase.initializeApp(config);
+
 
 export const createUserProfileDocument = async (userAuth, additionalData) => {
-    if (!userAuth)
-        return;
+    if (!userAuth) return;
+
     const userRef = firestore.doc(`users/${userAuth.uid}`);
     const snapShot = await userRef.get();
-    // console.log(snapShot);
-    
+
     if (!snapShot.exists) {
         const { displayName, email } = userAuth;
         const createdAt = new Date();
@@ -28,7 +29,8 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
         try {
             await userRef.set({
                 displayName,
-                email, createdAt,
+                email,
+                createdAt,
                 ...additionalData
             });
         }
@@ -39,8 +41,21 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     return userRef;
 };
 
-firebase.initializeApp(config);
-
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedcollection = collections.docs.map(doc => {
+        const { title, items } = doc.data();
+        return {
+            routeName: encodeURI(title.toLowerCase()),
+            id: doc.id,
+            title,
+            items
+        };
+    });
+    return transformedcollection.reduce((acc, item) => {
+        acc[item.title.toLowerCase()] = item;
+        return acc;
+    }, {});
+};
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();

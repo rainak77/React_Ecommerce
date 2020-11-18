@@ -1,4 +1,5 @@
 import React from 'react';
+import { createStructuredSelector } from 'reselect';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/homepage/homepage.component';
@@ -9,32 +10,32 @@ import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up
 import { connect } from 'react-redux';
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 import { CurrentUserSet } from './redux/user/user.action';
+import { selectCurrentUser } from './redux/user/user.selector';
 import CheckOutPage from './pages/checkout/checkout.component';
 
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
 
+  }
   unsubscribeFromAuth = null;
 
 
   componentDidMount() {
-    // console.log(this.props);
     const { setCurrentUser } = this.props;
-
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
-      // console.log(userAuth);
+      console.log(userAuth);
+
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
         userRef.onSnapshot(snapshot => {
-          setCurrentUser(
-            { id: snapshot.id, ...snapshot.data() }
-          );
+          setCurrentUser({ id: snapshot.id, ...snapshot.data() });
         });
       }
       else
         setCurrentUser(userAuth);
-
     });
   }
 
@@ -43,7 +44,6 @@ class App extends React.Component {
   }
 
   render() {
-    console.log('fff');
     return (
       <div className="App" >
         <Header />
@@ -57,8 +57,13 @@ class App extends React.Component {
     );
   };
 }
-const mapStateToProps = ({ user }) => ({
-  currentUser: user.currentUser
+// const mapStateToProps = ({ user }) => ({
+//   currentUser: user.currentUser
+// });
+
+
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser
 });
 
 
