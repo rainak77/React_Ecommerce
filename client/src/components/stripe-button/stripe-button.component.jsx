@@ -1,8 +1,6 @@
 import React from 'react';
 import StripeCheckout from 'react-stripe-checkout';
 import axios from 'axios';
-import { json } from 'body-parser';
-import { errors } from 'stripe';
 
 
 
